@@ -3,6 +3,22 @@ from data.programs import programs
 def normalize_text(text):
     return text.strip().lower()
 
+def normalize_field(field):
+
+    field = normalize_text(field)
+
+    if field in ["ai", "artificial intelligence", "a.i."]:
+        return "ai"
+
+    elif field in ["data science", "data scientist", "ds"]:
+        return "data science"
+
+    elif field in ["computer science", "cs"]:
+        return "computer science"
+
+    else:
+        return field
+
 def get_student_profile():
 
     name = input("Enter your name: ")
@@ -54,7 +70,7 @@ def check_eligibility(student, program):
     if student["ielts"] < program["minimum_ielts"]:
         reasons.append("IELTS score is below the minimum requirement.")
 
-    if normalize_text(student["field"]) != normalize_text(program["field"]):
+    if normalize_field(student["field"]) != normalize_field(program["field"]):
         reasons.append("Field does not match the program.")
 
     if student["budget"] < program["tuition_fee"]:
