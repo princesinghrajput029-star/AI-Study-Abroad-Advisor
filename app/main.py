@@ -23,10 +23,22 @@ def get_student_profile():
 
     name = input("Enter your name: ")
     degree = input("Enter your degree: ").strip()
-    cgpa = float(input("Enter your CGPA: "))
-    ielts = float(input("Enter your IELTS score: "))
+    try:
+        cgpa = float(input("Enter your CGPA: "))
+    except ValueError:
+        print("❌ Invalid CGPA. Please enter a number.")
+        return None
+    try:
+        ielts = float(input("Enter your IELTS score: "))
+    except ValueError:
+        print("❌ Invalid IELTS score. Please enter a number.")
+        return None
     field = input("Enter your desired field: ").strip()
-    budget = float(input("Enter your total budget in INR: "))
+    try:
+        budget = float(input("Enter your total budget in INR "))
+    except ValueError:
+        print("❌ Invalid budget. Please enter a number.")
+        return None
 
     student = {
         "name": name,
@@ -80,8 +92,7 @@ def check_eligibility(student, program):
 
 student = get_student_profile()
 
-if validate_profile(student):
-
+if student is not None and validate_profile(student):
     print("\n--- Student Profile ---")
     print(student)
 
@@ -106,16 +117,16 @@ if validate_profile(student):
             for reason in reasons:
                 print("-", reason)
 
-print("\n--- Recommended Programs ---")
+    print("\n--- Recommended Programs ---")
 
-if len(eligible_programs) == 0:
-    print("❌ No suitable programs found.")
+    if len(eligible_programs) == 0:
+        print("❌ No suitable programs found.")
 
-else:
-    for program in eligible_programs:
-        print("\nUniversity:", program["university"])
-        print("Country:", program["country"])
-        print("Course:", program["course"])
-        print("Tuition Fee:", program["tuition_fee"])
-        print("Language:", program["language"])
+    else:
+        for program in eligible_programs:
+            print("\nUniversity:", program["university"])
+            print("Country:", program["country"])
+            print("Course:", program["course"])
+            print("Tuition Fee:", program["tuition_fee"])
+            print("Language:", program["language"])
  
