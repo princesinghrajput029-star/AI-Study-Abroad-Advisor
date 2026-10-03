@@ -102,6 +102,10 @@ if st.button("🔍 Find Suitable Programs"):
 
         else:
 
+            # -------------------------------
+            # Student Profile
+            # -------------------------------
+
             st.subheader("📋 Student Profile")
 
             col1, col2 = st.columns(2)
@@ -118,6 +122,11 @@ if st.button("🔍 Find Suitable Programs"):
 
 
             st.divider()
+
+
+            # -------------------------------
+            # Program Results
+            # -------------------------------
 
             st.subheader("🎯 Program Results")
 
@@ -175,13 +184,46 @@ if st.button("🔍 Find Suitable Programs"):
 
                         st.write("**Matched Criteria:**")
 
-                        for match in matched:
-                            st.write("✅", match)
+                        if len(matched) == 0:
+                            st.write("None")
+                        else:
+                            for match in matched:
+                                st.write("✅", match)
 
                         st.write("**Reasons:**")
 
                         for reason in reasons:
                             st.write("❌", reason)
+
+
+            # -------------------------------
+            # Program Comparison
+            # -------------------------------
+
+            if len(eligible_programs) > 0:
+
+                st.divider()
+
+                st.subheader("📊 Program Comparison")
+
+                comparison_data = []
+
+                for program in eligible_programs:
+
+                    comparison_data.append({
+                        "University": program["university"],
+                        "Country": program["country"],
+                        "Course": program["course"],
+                        "Tuition Fee": f"₹{program['tuition_fee']:,}",
+                        "Minimum CGPA": program["minimum_cgpa"],
+                        "Minimum IELTS": program["minimum_ielts"],
+                        "Language": program["language"]
+                    })
+
+                st.dataframe(
+                    comparison_data,
+                    use_container_width=True
+                )
 
 
             # -------------------------------
