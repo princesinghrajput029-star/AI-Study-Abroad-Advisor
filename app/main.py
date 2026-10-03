@@ -18,6 +18,24 @@ def normalize_field(field):
 
     else:
         return field
+def normalize_degree(degree):
+
+    degree = normalize_text(degree)
+
+    if degree in ["btech", "b.tech", "b.tech.", "b tech"]:
+        return "btech"
+
+    elif degree in ["be", "b.e", "b.e.", "bachelor of engineering"]:
+        return "be"
+
+    elif degree in ["bsc", "b.sc", "b.sc.", "bachelor of science"]:
+        return "bsc"
+
+    elif degree in ["bca", "b.c.a", "bachelor of computer applications"]:
+        return "bca"
+
+    else:
+        return degree    
 
 def get_student_profile():
 
@@ -76,7 +94,7 @@ def check_eligibility(student, program):
     if student["cgpa"] < program["minimum_cgpa"]:
         reasons.append("CGPA is below the minimum requirement.")
 
-    if normalize_text(student["degree"]) != normalize_text(program["required_degree"]):
+    if normalize_degree(student["degree"]) != normalize_degree(program["required_degree"]):
         reasons.append("Degree does not match the program requirement.")
 
     if student["ielts"] < program["minimum_ielts"]:
