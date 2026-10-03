@@ -90,23 +90,34 @@ def validate_profile(student):
 def check_eligibility(student, program):
 
     reasons = []
+    matched = []
 
     if student["cgpa"] < program["minimum_cgpa"]:
         reasons.append("CGPA is below the minimum requirement.")
+    else:
+        matched.append("CGPA meets the requirement.")
 
     if normalize_degree(student["degree"]) != normalize_degree(program["required_degree"]):
         reasons.append("Degree does not match the program requirement.")
+    else:
+        matched.append("Degree matches the requirement.")
 
     if student["ielts"] < program["minimum_ielts"]:
         reasons.append("IELTS score is below the minimum requirement.")
+    else:
+        matched.append("IELTS meets the requirement.")
 
     if normalize_field(student["field"]) != normalize_field(program["field"]):
         reasons.append("Field does not match the program.")
+    else:
+        matched.append("Field matches the program.")
 
     if student["budget"] < program["tuition_fee"]:
         reasons.append("Budget is lower than the tuition fee.")
+    else:
+        matched.append("Budget is sufficient.")
 
-    return reasons
+    return reasons, matched
 
 student = get_student_profile()
 
@@ -118,7 +129,7 @@ if student is not None and validate_profile(student):
     eligible_programs = []
     for program in programs:
 
-        reasons = check_eligibility(student, program)
+        reasons, matched = check_eligibility(student, program)
 
         print("\nUniversity:", program["university"])
         print("Country:", program["country"])
@@ -127,6 +138,11 @@ if student is not None and validate_profile(student):
 
         if len(reasons) == 0:
             print("✅ Eligible")
+            print("Matched Criteria:")
+
+            for match in matched:
+                print("-", match)
+
             eligible_programs.append(program)
         else:
             print("❌ Not eligible")
