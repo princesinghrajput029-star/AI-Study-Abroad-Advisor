@@ -1,7 +1,13 @@
 from data.programs import programs
 
+
+# -------------------------------
+# Text Normalization
+# -------------------------------
+
 def normalize_text(text):
     return text.strip().lower()
+
 
 def normalize_field(field):
 
@@ -18,6 +24,8 @@ def normalize_field(field):
 
     else:
         return field
+
+
 def normalize_degree(degree):
 
     degree = normalize_text(degree)
@@ -35,25 +43,34 @@ def normalize_degree(degree):
         return "bca"
 
     else:
-        return degree    
+        return degree
+
+
+# -------------------------------
+# Student Profile
+# -------------------------------
 
 def get_student_profile():
 
-    name = input("Enter your name: ")
+    name = input("Enter your name: ").strip()
     degree = input("Enter your degree: ").strip()
+
     try:
         cgpa = float(input("Enter your CGPA: "))
     except ValueError:
         print("❌ Invalid CGPA. Please enter a number.")
         return None
+
     try:
         ielts = float(input("Enter your IELTS score: "))
     except ValueError:
         print("❌ Invalid IELTS score. Please enter a number.")
         return None
+
     field = input("Enter your desired field: ").strip()
+
     try:
-        budget = float(input("Enter your total budget in INR "))
+        budget = float(input("Enter your total budget in INR: "))
     except ValueError:
         print("❌ Invalid budget. Please enter a number.")
         return None
@@ -69,6 +86,10 @@ def get_student_profile():
 
     return student
 
+
+# -------------------------------
+# Profile Validation
+# -------------------------------
 
 def validate_profile(student):
 
@@ -87,31 +108,42 @@ def validate_profile(student):
     return True
 
 
+# -------------------------------
+# Eligibility Checking
+# -------------------------------
+
 def check_eligibility(student, program):
 
     reasons = []
     matched = []
 
+    # CGPA
     if student["cgpa"] < program["minimum_cgpa"]:
         reasons.append("CGPA is below the minimum requirement.")
     else:
         matched.append("CGPA meets the requirement.")
 
-    if normalize_degree(student["degree"]) != normalize_degree(program["required_degree"]):
+    # Degree
+    if normalize_degree(student["degree"]) != normalize_degree(
+        program["required_degree"]
+    ):
         reasons.append("Degree does not match the program requirement.")
     else:
         matched.append("Degree matches the requirement.")
 
+    # IELTS
     if student["ielts"] < program["minimum_ielts"]:
         reasons.append("IELTS score is below the minimum requirement.")
     else:
         matched.append("IELTS meets the requirement.")
 
+    # Field
     if normalize_field(student["field"]) != normalize_field(program["field"]):
         reasons.append("Field does not match the program.")
     else:
         matched.append("Field matches the program.")
 
+    # Budget
     if student["budget"] < program["tuition_fee"]:
         reasons.append("Budget is lower than the tuition fee.")
     else:
@@ -119,14 +151,22 @@ def check_eligibility(student, program):
 
     return reasons, matched
 
+
+# -------------------------------
+# Main Program
+# -------------------------------
+
 student = get_student_profile()
 
 if student is not None and validate_profile(student):
+
     print("\n--- Student Profile ---")
     print(student)
 
     print("\n--- Program Eligibility ---")
+
     eligible_programs = []
+
     for program in programs:
 
         reasons, matched = check_eligibility(student, program)
@@ -136,31 +176,54 @@ if student is not None and validate_profile(student):
         print("Course:", program["course"])
         print("Tuition Fee:", program["tuition_fee"])
 
+        # Eligible
         if len(reasons) == 0:
+
             print("✅ Eligible")
+
+            print("Match Score:", len(matched), "/ 5")
+
             print("Matched Criteria:")
 
             for match in matched:
                 print("-", match)
 
             eligible_programs.append(program)
+
+        # Not Eligible
         else:
+
             print("❌ Not eligible")
+
+            print("Matched Criteria:")
+
+            if len(matched) == 0:
+                print("- None")
+            else:
+                for match in matched:
+                    print("-", match)
+
             print("Reasons:")
 
             for reason in reasons:
                 print("-", reason)
 
+    # -------------------------------
+    # Recommended Programs
+    # -------------------------------
+
     print("\n--- Recommended Programs ---")
 
     if len(eligible_programs) == 0:
+
         print("❌ No suitable programs found.")
 
     else:
+
         for program in eligible_programs:
+
             print("\nUniversity:", program["university"])
             print("Country:", program["country"])
             print("Course:", program["course"])
             print("Tuition Fee:", program["tuition_fee"])
             print("Language:", program["language"])
- 
