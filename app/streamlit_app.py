@@ -4,7 +4,8 @@ from app.main import (
     normalize_field,
     normalize_degree,
     check_eligibility,
-    validate_profile
+    validate_profile,
+    calculate_match_score
 )
 
 
@@ -67,11 +68,26 @@ field = st.selectbox(
     ]
 )
 
+country = st.selectbox(
+    "🌍 Preferred Country",
+    [
+        "All Countries",
+        "Germany",
+        "France",
+        "Ireland"
+    ]
+)
+
 budget = st.number_input(
     "💰 Total Budget (INR)",
     min_value=1.0,
     value=1500000.0,
     step=50000.0
+)
+
+search = st.text_input(
+    "🔎 Search Program or University",
+    placeholder="e.g. Artificial Intelligence"
 )
 
 
@@ -93,6 +109,7 @@ if st.button("🔍 Find Suitable Programs"):
             "cgpa": cgpa,
             "ielts": ielts,
             "field": field,
+            "country": country,
             "budget": budget
         }
 
@@ -118,8 +135,8 @@ if st.button("🔍 Find Suitable Programs"):
             with col2:
                 st.write("**IELTS:**", ielts)
                 st.write("**Field:**", field)
+                st.write("**Country:**", country)
                 st.write("**Budget:** ₹", f"{budget:,.0f}")
-
 
             st.divider()
 
@@ -132,8 +149,30 @@ if st.button("🔍 Find Suitable Programs"):
 
             eligible_programs = []
 
-
             for program in programs:
+
+                # Country Filter
+                if (
+                    country != "All Countries"
+                    and program["country"] != country
+                ):
+                    continue
+
+                # Search Filter
+                if search.strip():
+
+                    search_text = search.strip().lower()
+
+                    program_text = (
+                        program["university"]
+                        + " "
+                        + program["course"]
+                        + " "
+                        + program["country"]
+                    ).lower()
+
+                    if search_text not in program_text:
+                        continue
 
                 reasons, matched = check_eligibility(
                     student,
@@ -143,6 +182,52 @@ if st.button("🔍 Find Suitable Programs"):
                 if len(reasons) == 0:
 
                     eligible_programs.append(program)
+
+                else:
+
+                    with st.expander(
+                        f"❌ {program['course']} — "
+                        f"{program['country']}"
+                    ):
+
+                        st.write("**Matched Criteria:**")
+
+                        if len(matched) == 0:
+                            st.write("None")
+
+                        else:
+                            for match in matched:
+                                st.write("✅", match)
+
+                        st.write("**Reasons:**")
+
+                        for reason in reasons:
+                            st.write("❌", reason)
+
+
+            # -------------------------------
+            # Sort Eligible Programs
+            # -------------------------------
+
+            eligible_programs.sort(
+                key=lambda program: program["tuition_fee"]
+            )
+
+
+            # -------------------------------
+            # Display Eligible Programs
+            # -------------------------------
+
+            if len(eligible_programs) > 0:
+
+                st.subheader("✅ Suitable Programs")
+
+                for program in eligible_programs:
+
+                    reasons, matched = check_eligibility(
+                        student,
+                        program
+                    )
 
                     st.success(
                         f"✅ {program['course']} — "
@@ -164,43 +249,71 @@ if st.button("🔍 Find Suitable Programs"):
                         f"{program['language']}"
                     )
 
+                    match_score = calculate_match_score(matched)
+
                     st.write(
-                        f"**Match Score:** "
-                        f"{len(matched)}/5"
+                        f"**Profile Match:** "
+                        f"{match_score}%"
                     )
 
-                    with st.expander("View matched criteria"):
+                    with st.expander("📊 View Score Breakdown"):
+
+                        if "Degree matches the requirement." in matched:
+                            st.write("🎓 Degree: 20%")
+                        else:
+                            st.write("❌ Degree: 0%")
+
+                        if "CGPA meets the requirement." in matched:
+                            st.write("📊 CGPA: 20%")
+                        else:
+                            st.write("❌ CGPA: 0%")
+
+                        if "IELTS meets the requirement." in matched:
+                            st.write("📝 IELTS: 20%")
+                        else:
+                            st.write("❌ IELTS: 0%")
+
+                        if "Field matches the program." in matched:
+                            st.write("💻 Field: 20%")
+                        else:
+                            st.write("❌ Field: 0%")
+
+                        if "Budget is sufficient." in matched:
+                            st.write("💰 Budget: 20%")
+                        else:
+                            st.write("❌ Budget: 0%")
+
+                    with st.expander(
+                        "View matched criteria"
+                    ):
 
                         for match in matched:
                             st.write("✅", match)
 
 
-                else:
+                # -------------------------------
+                # Best Budget Option
+                # -------------------------------
 
-                    with st.expander(
-                        f"❌ {program['course']} — "
-                        f"{program['country']}"
-                    ):
+                st.divider()
 
-                        st.write("**Matched Criteria:**")
+                st.subheader("💰 Most Affordable Option")
 
-                        if len(matched) == 0:
-                            st.write("None")
-                        else:
-                            for match in matched:
-                                st.write("✅", match)
+                cheapest_program = eligible_programs[0]
 
-                        st.write("**Reasons:**")
-
-                        for reason in reasons:
-                            st.write("❌", reason)
+                st.info(
+                    f"🏆 {cheapest_program['course']} — "
+                    f"{cheapest_program['country']}\n\n"
+                    f"**University:** "
+                    f"{cheapest_program['university']}\n\n"
+                    f"**Tuition Fee:** "
+                    f"₹{cheapest_program['tuition_fee']:,}"
+                )
 
 
-            # -------------------------------
-            # Program Comparison
-            # -------------------------------
-
-            if len(eligible_programs) > 0:
+                # -------------------------------
+                # Program Comparison
+                # -------------------------------
 
                 st.divider()
 
@@ -226,22 +339,13 @@ if st.button("🔍 Find Suitable Programs"):
                 )
 
 
-            # -------------------------------
-            # Recommendations
-            # -------------------------------
+                # -------------------------------
+                # Recommendations
+                # -------------------------------
 
-            st.divider()
+                st.divider()
 
-            st.subheader("⭐ Recommended Programs")
-
-            if len(eligible_programs) == 0:
-
-                st.warning(
-                    "No suitable programs found "
-                    "for the given profile."
-                )
-
-            else:
+                st.subheader("⭐ Recommended Programs")
 
                 for program in eligible_programs:
 
@@ -250,3 +354,11 @@ if st.button("🔍 Find Suitable Programs"):
                         f"{program['course']} | "
                         f"{program['university']}"
                     )
+
+
+            else:
+
+                st.warning(
+                    "No suitable programs found "
+                    "for the given filters and profile."
+                )

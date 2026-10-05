@@ -151,4 +151,8 @@ def check_eligibility(student, program):
 
     return reasons, matched
 
+def calculate_match_score(matched):
 
+    score = len(matched) * 20
+
+    return score
