@@ -10,17 +10,26 @@ An intelligent study-abroad recommendation system that analyzes a student's acad
 - Budget validation
 - Degree normalization
 - Field normalization
+- Country filtering
+- Program/university search
 - Program eligibility checking
-- Reasons for rejection
 - Matched criteria
-- Match score
+- Reasons for rejection
+- Profile match score
+- Profile match level
+- Improvement suggestions
+- Eligibility summary
+- Most affordable eligible program
+- Program comparison
 - Recommended programs
+- Streamlit web interface
 
 ## 🛠️ Tech Stack
 
 - Python
 - Streamlit
-- Git & GitHub
+- Git
+- GitHub
 
 ## 📁 Project Structure
 
@@ -29,7 +38,8 @@ AI-Study-Abroad-Advisor/
 │
 ├── app/
 │   ├── __init__.py
-│   └── main.py
+│   ├── main.py
+│   └── streamlit_app.py
 │
 ├── data/
 │   ├── __init__.py

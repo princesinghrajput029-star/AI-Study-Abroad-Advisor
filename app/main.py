@@ -6,8 +6,13 @@ from data.programs import programs
 # -------------------------------
 
 def normalize_text(text):
+
     return text.strip().lower()
 
+
+# -------------------------------
+# Field Normalization
+# -------------------------------
 
 def normalize_field(field):
 
@@ -25,6 +30,10 @@ def normalize_field(field):
     else:
         return field
 
+
+# -------------------------------
+# Degree Normalization
+# -------------------------------
 
 def normalize_degree(degree):
 
@@ -47,41 +56,63 @@ def normalize_degree(degree):
 
 
 # -------------------------------
-# Student Profile
+# Student Profile Input
 # -------------------------------
 
 def get_student_profile():
 
     name = input("Enter your name: ").strip()
+
     degree = input("Enter your degree: ").strip()
 
     try:
+
         cgpa = float(input("Enter your CGPA: "))
+
     except ValueError:
+
         print("❌ Invalid CGPA. Please enter a number.")
+
         return None
 
     try:
+
         ielts = float(input("Enter your IELTS score: "))
+
     except ValueError:
+
         print("❌ Invalid IELTS score. Please enter a number.")
+
         return None
 
     field = input("Enter your desired field: ").strip()
 
     try:
-        budget = float(input("Enter your total budget in INR: "))
+
+        budget = float(
+            input("Enter your total budget in INR: ")
+        )
+
     except ValueError:
+
         print("❌ Invalid budget. Please enter a number.")
+
         return None
 
     student = {
+
         "name": name,
+
         "degree": degree,
+
         "cgpa": cgpa,
+
         "ielts": ielts,
+
         "field": field,
+
         "budget": budget
+
     }
 
     return student
@@ -94,62 +125,135 @@ def get_student_profile():
 def validate_profile(student):
 
     if student["cgpa"] < 0 or student["cgpa"] > 10:
-        print("❌ Invalid CGPA. CGPA must be between 0 and 10.")
+
+        print(
+            "❌ Invalid CGPA. "
+            "CGPA must be between 0 and 10."
+        )
+
         return False
 
     if student["ielts"] < 0 or student["ielts"] > 9:
-        print("❌ Invalid IELTS score. IELTS must be between 0 and 9.")
+
+        print(
+            "❌ Invalid IELTS score. "
+            "IELTS score must be between 0 and 9."
+        )
+
         return False
 
     if student["budget"] <= 0:
-        print("❌ Invalid budget. Budget must be greater than 0.")
+
+        print(
+            "❌ Invalid budget. "
+            "Budget must be greater than 0."
+        )
+
         return False
 
     return True
 
 
 # -------------------------------
-# Eligibility Checking
+# Eligibility Check
 # -------------------------------
 
 def check_eligibility(student, program):
 
     reasons = []
+
     matched = []
 
+
     # CGPA
+
     if student["cgpa"] < program["minimum_cgpa"]:
-        reasons.append("CGPA is below the minimum requirement.")
+
+        reasons.append(
+            "CGPA is below the minimum requirement."
+        )
+
     else:
-        matched.append("CGPA meets the requirement.")
+
+        matched.append(
+            "CGPA meets the requirement."
+        )
+
 
     # Degree
-    if normalize_degree(student["degree"]) != normalize_degree(
+
+    if normalize_degree(
+        student["degree"]
+    ) != normalize_degree(
         program["required_degree"]
     ):
-        reasons.append("Degree does not match the program requirement.")
+
+        reasons.append(
+            "Degree does not match the program requirement."
+        )
+
     else:
-        matched.append("Degree matches the requirement.")
+
+        matched.append(
+            "Degree matches the requirement."
+        )
+
 
     # IELTS
+
     if student["ielts"] < program["minimum_ielts"]:
-        reasons.append("IELTS score is below the minimum requirement.")
+
+        reasons.append(
+            "IELTS score is below the minimum requirement."
+        )
+
     else:
-        matched.append("IELTS meets the requirement.")
+
+        matched.append(
+            "IELTS meets the requirement."
+        )
+
 
     # Field
-    if normalize_field(student["field"]) != normalize_field(program["field"]):
-        reasons.append("Field does not match the program.")
+
+    if normalize_field(
+        student["field"]
+    ) != normalize_field(
+        program["field"]
+    ):
+
+        reasons.append(
+            "Field does not match the program."
+        )
+
     else:
-        matched.append("Field matches the program.")
+
+        matched.append(
+            "Field matches the program."
+        )
+
 
     # Budget
+
     if student["budget"] < program["tuition_fee"]:
-        reasons.append("Budget is lower than the tuition fee.")
+
+        reasons.append(
+            "Budget is lower than the tuition fee."
+        )
+
     else:
-        matched.append("Budget is sufficient.")
+
+        matched.append(
+            "Budget is sufficient."
+        )
+
 
     return reasons, matched
+
+
+# -------------------------------
+# Match Score
+# -------------------------------
 
 def calculate_match_score(matched):
 
@@ -157,16 +261,95 @@ def calculate_match_score(matched):
 
     return score
 
+
+# -------------------------------
+# Match Level
+# -------------------------------
+
 def get_match_level(score):
 
     if score >= 80:
+
         return "Strong Profile Match"
 
     elif score >= 60:
+
         return "Moderate Profile Match"
 
     elif score >= 40:
+
         return "Low Profile Match"
 
     else:
+
         return "Very Low Profile Match"
+
+
+# -------------------------------
+# Improvement Suggestions
+# -------------------------------
+
+def get_improvement_suggestions(student, program):
+
+    suggestions = []
+
+
+    # CGPA
+
+    if student["cgpa"] < program["minimum_cgpa"]:
+
+        suggestions.append(
+            f"Improve CGPA to at least "
+            f"{program['minimum_cgpa']}."
+        )
+
+
+    # IELTS
+
+    if student["ielts"] < program["minimum_ielts"]:
+
+        suggestions.append(
+            f"Improve IELTS score to at least "
+            f"{program['minimum_ielts']}."
+        )
+
+
+    # Degree
+
+    if normalize_degree(
+        student["degree"]
+    ) != normalize_degree(
+        program["required_degree"]
+    ):
+
+        suggestions.append(
+            f"Required degree: "
+            f"{program['required_degree']}."
+        )
+
+
+    # Field
+
+    if normalize_field(
+        student["field"]
+    ) != normalize_field(
+        program["field"]
+    ):
+
+        suggestions.append(
+            f"Consider programs related to "
+            f"{program['field']}."
+        )
+
+
+    # Budget
+
+    if student["budget"] < program["tuition_fee"]:
+
+        suggestions.append(
+            f"Increase budget to at least "
+            f"₹{program['tuition_fee']:,}."
+        )
+
+
+    return suggestions

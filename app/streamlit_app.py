@@ -8,7 +8,8 @@ from app.main import (
     check_eligibility,
     validate_profile,
     calculate_match_score,
-    get_match_level
+    get_match_level,
+    get_improvement_suggestions
 )
 
 
@@ -39,7 +40,9 @@ st.write(
 # Student Inputs
 # -------------------------------
 
-name = st.text_input("👤 Name")
+name = st.text_input(
+    "👤 Name"
+)
 
 
 degree = st.selectbox(
@@ -114,7 +117,9 @@ if st.button("🔍 Find Suitable Programs"):
 
     if not name.strip():
 
-        st.warning("Please enter your name.")
+        st.warning(
+            "Please enter your name."
+        )
 
     else:
 
@@ -123,13 +128,21 @@ if st.button("🔍 Find Suitable Programs"):
         # -------------------------------
 
         student = {
+
             "name": name,
+
             "degree": degree,
+
             "cgpa": cgpa,
+
             "ielts": ielts,
+
             "field": field,
+
             "country": country,
+
             "budget": budget
+
         }
 
 
@@ -139,7 +152,9 @@ if st.button("🔍 Find Suitable Programs"):
 
         if not validate_profile(student):
 
-            st.error("Invalid student profile.")
+            st.error(
+                "Invalid student profile."
+            )
 
         else:
 
@@ -147,7 +162,10 @@ if st.button("🔍 Find Suitable Programs"):
             # Display Student Profile
             # -------------------------------
 
-            st.subheader("📋 Student Profile")
+            st.subheader(
+                "📋 Student Profile"
+            )
+
 
             col1, col2 = st.columns(2)
 
@@ -200,7 +218,9 @@ if st.button("🔍 Find Suitable Programs"):
             # Program Results
             # -------------------------------
 
-            st.subheader("🎯 Program Results")
+            st.subheader(
+                "🎯 Program Results"
+            )
 
 
             eligible_programs = []
@@ -234,15 +254,19 @@ if st.button("🔍 Find Suitable Programs"):
 
                 if search.strip():
 
-                    search_text = search.strip().lower()
+                    search_text = (
+                        search.strip().lower()
+                    )
 
 
                     program_text = (
+
                         program["university"]
                         + " "
                         + program["course"]
                         + " "
                         + program["country"]
+
                     ).lower()
 
 
@@ -274,7 +298,9 @@ if st.button("🔍 Find Suitable Programs"):
 
                 if len(reasons) == 0:
 
-                    eligible_programs.append(program)
+                    eligible_programs.append(
+                        program
+                    )
 
 
                 # -------------------------------
@@ -298,7 +324,9 @@ if st.button("🔍 Find Suitable Programs"):
 
                         if len(matched) == 0:
 
-                            st.write("None")
+                            st.write(
+                                "None"
+                            )
 
                         else:
 
@@ -323,6 +351,34 @@ if st.button("🔍 Find Suitable Programs"):
                             )
 
 
+                        # -------------------------------
+                        # Improvement Suggestions
+                        # -------------------------------
+
+                        suggestions = (
+                            get_improvement_suggestions(
+                                student,
+                                program
+                            )
+                        )
+
+
+                        if len(suggestions) > 0:
+
+                            st.write(
+                                "💡 **How to Improve "
+                                "Your Profile:**"
+                            )
+
+
+                            for suggestion in suggestions:
+
+                                st.write(
+                                    "👉",
+                                    suggestion
+                                )
+
+
             # -------------------------------
             # Eligibility Summary
             # -------------------------------
@@ -334,7 +390,9 @@ if st.button("🔍 Find Suitable Programs"):
             )
 
 
-            summary_col1, summary_col2, summary_col3 = st.columns(3)
+            summary_col1, summary_col2, summary_col3 = (
+                st.columns(3)
+            )
 
 
             with summary_col1:
@@ -366,12 +424,13 @@ if st.button("🔍 Find Suitable Programs"):
             # -------------------------------
 
             eligible_programs.sort(
-                key=lambda program: program["tuition_fee"]
+                key=lambda program:
+                program["tuition_fee"]
             )
 
 
             # -------------------------------
-            # Display Suitable Programs
+            # Suitable Programs
             # -------------------------------
 
             if len(eligible_programs) > 0:
@@ -385,9 +444,11 @@ if st.button("🔍 Find Suitable Programs"):
 
                 for program in eligible_programs:
 
-                    reasons, matched = check_eligibility(
-                        student,
-                        program
+                    reasons, matched = (
+                        check_eligibility(
+                            student,
+                            program
+                        )
                     )
 
 
@@ -395,11 +456,22 @@ if st.button("🔍 Find Suitable Programs"):
                     # Match Score
                     # -------------------------------
 
-                    match_score = calculate_match_score(
-                        matched
+                    match_score = (
+                        calculate_match_score(
+                            matched
+                        )
                     )
 
-                    match_level = get_match_level(match_score)
+
+                    # -------------------------------
+                    # Match Level
+                    # -------------------------------
+
+                    match_level = (
+                        get_match_level(
+                            match_score
+                        )
+                    )
 
 
                     st.success(
@@ -431,10 +503,47 @@ if st.button("🔍 Find Suitable Programs"):
                         f"{match_score}%"
                     )
 
+
                     st.write(
                         f"**Admission Profile Level:** "
                         f"{match_level}"
                     )
+
+
+                    # -------------------------------
+                    # Profile Status
+                    # -------------------------------
+
+                    if match_score == 100:
+
+                        st.success(
+                            "🎉 Your profile meets all "
+                            "currently checked requirements."
+                        )
+
+                    else:
+
+                        suggestions = (
+                            get_improvement_suggestions(
+                                student,
+                                program
+                            )
+                        )
+
+
+                        if len(suggestions) > 0:
+
+                            with st.expander(
+                                "💡 How can you improve "
+                                "your profile?"
+                            ):
+
+                                for suggestion in suggestions:
+
+                                    st.write(
+                                        "👉",
+                                        suggestion
+                                    )
 
 
                     # -------------------------------
