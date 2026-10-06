@@ -156,3 +156,17 @@ def calculate_match_score(matched):
     score = len(matched) * 20
 
     return score
+
+def get_match_level(score):
+
+    if score >= 80:
+        return "Strong Profile Match"
+
+    elif score >= 60:
+        return "Moderate Profile Match"
+
+    elif score >= 40:
+        return "Low Profile Match"
+
+    else:
+        return "Very Low Profile Match"
